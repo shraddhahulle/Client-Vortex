@@ -1,5 +1,5 @@
 # Client-Vertox
-SmartClientNexus is a web-based application built using modern web technologies like Node.js, Tailwind CSS, and more. It provides a seamless and responsive user experience.
+Client-Vertox is a web-based application built using modern web technologies like Node.js, Tailwind CSS, and more. It provides a seamless and responsive user experience.
 
 ## Features
 - Modern UI with Tailwind CSS for fast and responsive design
@@ -36,8 +36,8 @@ Ensure you have the following installed:
 ### Steps
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-repo/smartclientnexus.git
-   cd smartclientnexus
+   git clone https://github.com/your-repo/Client-Vertox.git
+   cd Client-Vertox
    ```
 2. Install dependencies:
    ```sh
