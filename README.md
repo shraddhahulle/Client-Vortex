@@ -19,7 +19,7 @@ This project is built with .
 - shadcn-ui
 - Tailwind CSS
 
-- 
+## Link to Project - https://clientvortex.netlify.app/
 
 ![client](https://github.com/user-attachments/assets/b77bb6ab-cf71-4600-b0f2-adbb5fd9a118)
 
