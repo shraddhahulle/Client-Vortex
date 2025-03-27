@@ -1,0 +1,167 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+
+    --primary: 45 100% 51%; /* yellow */
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 0%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 0%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 45 100% 51%;
+
+    --radius: 0.5rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/90 backdrop-blur-lg border border-white/20 shadow-md;
+  }
+  
+  /* Primary button with hover and active states */
+  .btn-primary {
+    @apply bg-crm-yellow text-black font-medium px-4 py-2 rounded-md
+           transition-all duration-300 ease-in-out
+           hover:bg-crm-yellow-hover hover:shadow-md
+           active:scale-[0.98] active:shadow-inner;
+  }
+  
+  /* Secondary button with hover and active states */
+  .btn-secondary {
+    @apply bg-crm-light-gray text-black font-medium px-4 py-2 rounded-md
+           transition-all duration-300 ease-in-out
+           hover:bg-crm-medium-gray hover:shadow-sm
+           active:scale-[0.98] active:shadow-inner;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-crm-light-gray p-6
+           transition-all duration-300 ease-in-out
+           hover:shadow-md;
+  }
+  
+  /* Statistic card */
+  .stat-card {
+    @apply card flex flex-col gap-2;
+  }
+  
+  /* Section headings */
+  .section-heading {
+    @apply text-xl font-semibold mb-4 flex items-center gap-2;
+  }
+  
+  /* Table styles */
+  .table-container {
+    @apply rounded-xl border border-crm-light-gray overflow-hidden;
+  }
+  
+  .table-header {
+    @apply bg-crm-light-gray text-black font-medium text-sm uppercase tracking-wider;
+  }
+  
+  .table-row {
+    @apply border-b border-crm-light-gray hover:bg-crm-light-gray/50 transition-colors;
+  }
+  
+  .table-cell {
+    @apply px-4 py-3 text-sm;
+  }
+  
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  
+  .badge-yellow {
+    @apply bg-crm-yellow-light text-black;
+  }
+  
+  .badge-gray {
+    @apply bg-crm-light-gray text-crm-dark-gray;
+  }
+  
+  /* Form elements */
+  .form-input {
+    @apply w-full rounded-md border border-crm-light-gray px-3 py-2
+           focus:outline-none focus:ring-2 focus:ring-crm-yellow focus:border-transparent
+           transition-all duration-200;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-crm-dark-gray mb-1;
+  }
+  
+  /* Sidebar and nav styles */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-2 rounded-md text-crm-dark-gray 
+           transition-all duration-200 
+           hover:bg-crm-yellow-light;
+  }
+  
+  .sidebar-link.active {
+    @apply bg-crm-yellow text-black;
+  }
+}
+
+/* Animation utilities */
+@layer utilities {
+  .delay-100 {
+    animation-delay: 100ms;
+  }
+  
+  .delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+}
