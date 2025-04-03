@@ -9,7 +9,7 @@ import {
   clients, tasks, recentActivities, 
   revenueData, taskStatusData, dashboardStats 
 } from "../utils/mockData";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Dialog, 
   DialogContent, 
@@ -22,6 +22,7 @@ import {
 import { toast } from "@/lib/toast";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [dateRange, setDateRange] = useState("7months");
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
@@ -152,7 +153,8 @@ const Dashboard = () => {
   };
   
   const handleClientClick = (clientId: number) => {
-    toast.info(`Viewing client details`);
+    navigate(`/clients/${clientId}`);
+    toast.info(`Viewing details for client #${clientId}`);
   };
   
   return (
@@ -418,13 +420,13 @@ const Dashboard = () => {
                       <p className="text-xs text-gray-500">{client.industry}</p>
                     </div>
                   </div>
-                  <Link 
-                    to={`/clients/${client.id}`} 
-                    className="p-2 rounded-full hover:bg-crm-light-gray"
+                  <button
                     onClick={() => handleClientClick(client.id)}
+                    className="p-2 rounded-full hover:bg-crm-light-gray"
+                    aria-label={`View details for ${client.name}`}
                   >
                     <ChevronRight size={16} />
-                  </Link>
+                  </button>
                 </div>
               ))}
             </div>
