@@ -1,6 +1,6 @@
 
-// Direct import and re-export from the sonner package
-import { toast, Toaster } from "sonner";
+// Import from sonner directly without aliases
+import { toast as sonnerToast, Toaster as SonnerToaster } from "sonner";
 
-// Re-export directly
-export { toast, Toaster };
+// Re-export with the original names
+export { sonnerToast as toast, SonnerToaster as Toaster };

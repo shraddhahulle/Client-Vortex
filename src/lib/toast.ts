@@ -1,6 +1,6 @@
 
-// Direct import from the sonner package
-import { toast } from "sonner";
+// Direct import from the sonner package with different name
+import { toast as sonnerToast } from "sonner";
 
-// Re-export toast function from sonner
-export { toast };
+// Re-export with original name
+export { sonnerToast as toast };
