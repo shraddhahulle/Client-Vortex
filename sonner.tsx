@@ -1,17 +1,16 @@
 
 import { useTheme } from "next-themes"
-import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner"
+import * as Sonner from "sonner"
 
-// Use a more specific and non-circular type definition
-type SonnerToasterProps = React.ComponentProps<typeof SonnerToaster>
-
-// Rename the component to avoid circular references
-const SonnerToasterComponent = ({ ...props }: SonnerToasterProps) => {
+// Use a simpler approach that avoids circular references
+const CustomToaster = ({ 
+  ...props 
+}: React.ComponentPropsWithoutRef<typeof Sonner.Toaster>) => {
   const { theme = "system" } = useTheme()
 
   return (
-    <SonnerToaster
-      theme={theme as SonnerToasterProps["theme"]}
+    <Sonner.Toaster
+      theme={theme as React.ComponentPropsWithoutRef<typeof Sonner.Toaster>["theme"]}
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -29,5 +28,6 @@ const SonnerToasterComponent = ({ ...props }: SonnerToasterProps) => {
   )
 }
 
-// Export with clean aliases that don't create circular references
-export { SonnerToasterComponent as Toaster, sonnerToast as toast }
+// Create clean exports without circular references
+export { CustomToaster as Toaster }
+export const toast = Sonner.toast
