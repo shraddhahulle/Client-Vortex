@@ -1,6 +1,6 @@
 
 // Direct import from the sonner package
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 
 // Re-export directly
-export { toast };
+export { toast, Toaster };
