@@ -1,15 +1,15 @@
 
 import { useTheme } from "next-themes"
-import * as Sonner from "sonner"
+import * as SonnerLib from "sonner"
 
 const Toaster = ({ 
   ...props 
-}: React.ComponentPropsWithoutRef<typeof Sonner.Toaster>) => {
+}: React.ComponentPropsWithoutRef<typeof SonnerLib.Toaster>) => {
   const { theme = "system" } = useTheme()
 
   return (
-    <Sonner.Toaster
-      theme={theme as React.ComponentPropsWithoutRef<typeof Sonner.Toaster>["theme"]}
+    <SonnerLib.Toaster
+      theme={theme as React.ComponentPropsWithoutRef<typeof SonnerLib.Toaster>["theme"]}
       className="toaster group"
       toastOptions={{
         classNames: {

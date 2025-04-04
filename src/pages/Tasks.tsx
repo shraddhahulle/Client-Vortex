@@ -1,5 +1,5 @@
 
-import { Suspense, memo, useEffect } from "react";
+import { Suspense, memo } from "react";
 import TasksSection from "@/components/TasksSection";
 import Header from "@/components/Header";
 
@@ -7,17 +7,6 @@ import Header from "@/components/Header";
 const MemoizedTasksSection = memo(TasksSection);
 
 const Tasks = () => {
-  // This effect helps optimize performance by preloading task data
-  useEffect(() => {
-    // Simulate preloading data to improve performance
-    const preloadData = async () => {
-      // In a real app, this would preload necessary data
-      console.log("Preloading tasks data for better performance");
-    };
-    
-    preloadData();
-  }, []);
-
   return (
     <div className="min-h-screen bg-white text-black">
       <Header />
