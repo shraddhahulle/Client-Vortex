@@ -11,6 +11,11 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
+              <img 
+                src="/lovable-uploads/80305d05-878e-475f-b522-7d2fea708da8.png" 
+                alt="ClientVortex Logo" 
+                className="h-10 mr-2" 
+              />
               <span className="text-2xl font-bold text-gray-900">ClientVortex</span>
             </div>
             <div className="flex items-center space-x-4">
