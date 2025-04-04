@@ -1,5 +1,5 @@
 
-import { toast } from "sonner"
+import { toast as sonnerToast } from "sonner";
 
 // Re-export toast function from sonner
-export { toast }
+export const toast = sonnerToast;
