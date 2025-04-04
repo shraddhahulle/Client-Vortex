@@ -1,7 +1,7 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { Toaster as SonnerToaster } from "sonner"
+import { toast, Toaster as SonnerToaster } from "sonner"
 
 const Toaster = ({ 
   ...props 
