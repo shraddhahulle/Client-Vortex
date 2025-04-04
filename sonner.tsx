@@ -1,6 +1,6 @@
 
 // Direct import from the sonner package
-import { toast as sonnerToast } from "sonner";
+import { toast } from "sonner";
 
-// Re-export with a different name to avoid circular reference
-export { sonnerToast as toast };
+// Re-export directly
+export { toast };
