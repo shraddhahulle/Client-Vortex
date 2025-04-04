@@ -1,6 +1,6 @@
 
-// Re-exporting the toast function from the sonner library
-import { toast as sonnerToast } from "sonner";
+// Direct import and re-export from the sonner package
+import { toast, Toaster } from "sonner";
 
-// Export with a different name to avoid circular reference
-export const toast = sonnerToast;
+// Re-export directly
+export { toast, Toaster };

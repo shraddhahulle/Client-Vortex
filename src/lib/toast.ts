@@ -1,5 +1,6 @@
 
-import { toast as sonnerToast } from "sonner";
+// Direct import from the sonner package
+import { toast } from "sonner";
 
 // Re-export toast function from sonner
-export const toast = sonnerToast;
+export { toast };
