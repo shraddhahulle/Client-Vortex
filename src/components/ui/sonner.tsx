@@ -1,16 +1,16 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Toaster as SonnerToaster, toast as sonnerToast } from "sonner";
+import { Toaster as OriginalToaster, toast as originalToast } from "sonner";
 
 const SonnerToasterWrapper = ({
   ...props
-}: React.ComponentPropsWithoutRef<typeof SonnerToaster>) => {
+}: React.ComponentPropsWithoutRef<typeof OriginalToaster>) => {
   const { theme = "system" } = useTheme();
 
   return (
-    <SonnerToaster
-      theme={theme as React.ComponentPropsWithoutRef<typeof SonnerToaster>["theme"]}
+    <OriginalToaster
+      theme={theme as React.ComponentPropsWithoutRef<typeof OriginalToaster>["theme"]}
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -29,4 +29,4 @@ const SonnerToasterWrapper = ({
 };
 
 // Export the component and the toast function
-export { SonnerToasterWrapper as Toaster, sonnerToast as toast };
+export { SonnerToasterWrapper as Toaster, originalToast as toast };

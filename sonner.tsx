@@ -1,6 +1,7 @@
 
-// Import from sonner directly without aliases
-import { toast as sonnerToast, Toaster as SonnerToaster } from "sonner";
+// Import from sonner directly with completely different alias names
+import { toast as originalToast, Toaster as OriginalToaster } from "sonner";
 
-// Re-export with the original names
-export { sonnerToast as toast, SonnerToaster as Toaster };
+// Re-export with the desired names
+export const toast = originalToast;
+export const Toaster = OriginalToaster;
