@@ -1,626 +1,580 @@
 
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, Edit, Trash, FileText, PlusCircle, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { 
+  User, Mail, Phone, MapPin, Calendar, 
+  FileText, BarChart2, Clock, ArrowLeft, 
+  ChevronRight, Edit2, Trash2, PlusCircle 
+} from "lucide-react";
+import { clients, tasks, recentActivities } from "@/utils/mockData";
 import Header from "@/components/Header";
-import { Badge } from "@/components/ui/badge";
-import { clients, tasks } from "../utils/mockData";
 import { toast } from "@/lib/toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+  DialogTrigger
+} from "@/components/ui/dialog";
 
 const ClientDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const clientId = parseInt(id || "0");
-  
+  const [client, setClient] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isAddNoteModalOpen, setIsAddNoteModalOpen] = useState(false);
   
-  // Find client by ID
-  const client = clients.find(c => c.id === clientId);
-  
-  // Get client tasks
+  // Get client's related tasks
   const clientTasks = tasks.filter(task => task.clientId === clientId);
   
-  // Handle if client not found
-  if (!client) {
+  // Get client's related activities
+  const clientActivities = recentActivities.filter(
+    activity => activity.clientId === clientId
+  ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  useEffect(() => {
+    // Simulate API fetch
+    setTimeout(() => {
+      const foundClient = clients.find(c => c.id === clientId);
+      
+      if (foundClient) {
+        setClient(foundClient);
+      } else {
+        toast.error("Client not found", {
+          description: "The client you're looking for doesn't exist."
+        });
+        navigate("/clients");
+      }
+      
+      setIsLoading(false);
+    }, 300);
+  }, [clientId, navigate]);
+  
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+  
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) {
+      return "just now";
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+    } else {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} ${days === 1 ? "day" : "days"} ago`;
+    }
+  };
+
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-white text-black">
         <Header />
-        <main className="pt-20 px-4 md:px-6 max-w-7xl mx-auto">
-          <div className="py-8 text-center">
-            <h2 className="text-2xl font-bold mb-2">Client Not Found</h2>
-            <p className="text-gray-600 mb-4">The client you're looking for doesn't exist or has been removed.</p>
-            <Link to="/clients" className="btn-primary">
-              Return to Clients
-            </Link>
+        <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto">
+          <div className="py-20 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-crm-yellow"></div>
+            <p className="mt-4">Loading client information...</p>
           </div>
         </main>
       </div>
     );
   }
-  
-  const handleEdit = () => {
-    toast.success("Client updated successfully");
-    setIsEditModalOpen(false);
-  };
-  
-  const handleDelete = () => {
-    toast.success("Client deleted successfully");
-    setIsDeleteModalOpen(false);
-    // In a real app, we would redirect to /clients here
-  };
-  
-  const handleAddNote = () => {
-    toast.success("Note added successfully");
-    setIsAddNoteModalOpen(false);
-  };
-  
-  // Format date
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
-  
-  // Calculate client value
-  const clientValue = client.revenue.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0
-  });
-  
+
+  if (!client) {
+    return (
+      <div className="min-h-screen bg-white text-black">
+        <Header />
+        <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto">
+          <div className="py-20 text-center">
+            <h2 className="text-2xl font-bold mb-2">Client Not Found</h2>
+            <p className="text-gray-600 mb-6">The client you're looking for doesn't exist.</p>
+            <button 
+              onClick={() => navigate("/clients")}
+              className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto"
+            >
+              <ArrowLeft size={16} className="mr-2" />
+              Back to Clients
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white text-black">
       <Header />
-      <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto">
-        <div className="py-6">
-          {/* Back button */}
-          <div className="mb-6">
-            <Link 
-              to="/clients" 
-              className="flex items-center text-gray-600 hover:text-black transition-colors"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              <span>Back to Clients</span>
-            </Link>
-          </div>
-          
-          {/* Client header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-            <div className="flex items-center">
-              <div 
-                className="w-16 h-16 rounded-full bg-crm-yellow flex items-center justify-center text-2xl font-bold mr-4"
-              >
-                {client.logo}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold">{client.name}</h1>
-                <p className="text-gray-600">{client.industry}</p>
-              </div>
+      <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto pb-16">
+        {/* Back button */}
+        <button 
+          onClick={() => navigate(-1)}
+          className="flex items-center text-gray-600 hover:text-black mb-6 transition-colors"
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Back
+        </button>
+        
+        {/* Client header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+          <div className="flex items-center">
+            <div className="rounded-full bg-crm-yellow w-16 h-16 flex items-center justify-center font-bold text-black text-2xl">
+              {client.logo}
             </div>
-            
-            <div className="mt-4 md:mt-0 flex items-center space-x-3">
-              <Badge variant="outline" className="bg-crm-yellow-light text-crm-yellow border-crm-yellow">
-                {client.status}
-              </Badge>
-              <button 
-                onClick={() => setIsEditModalOpen(true)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="Edit client"
-              >
-                <Edit size={16} />
-              </button>
-              <button 
-                onClick={() => setIsDeleteModalOpen(true)}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                aria-label="Delete client"
-              >
-                <Trash size={16} />
-              </button>
+            <div className="ml-4">
+              <h1 className="text-2xl font-bold">{client.name}</h1>
+              <p className="text-gray-600">{client.industry}</p>
             </div>
           </div>
           
-          {/* Client content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left column - Client info */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="card">
-                <h2 className="text-lg font-semibold mb-4">Contact Information</h2>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <Mail size={16} className="text-gray-500 mt-1 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Email</p>
-                      <a href={`mailto:${client.email}`} className="text-crm-yellow hover:underline">
-                        {client.email}
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <Phone size={16} className="text-gray-500 mt-1 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Phone</p>
-                      <a href={`tel:${client.phone}`} className="hover:underline">
-                        {client.phone}
-                      </a>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <MapPin size={16} className="text-gray-500 mt-1 mr-3" />
-                    <div>
-                      <p className="text-sm text-gray-500">Address</p>
-                      <p>123 Business St</p>
-                      <p>Suite 456</p>
-                      <p>New York, NY 10001</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <h2 className="text-lg font-semibold mb-4">Client Details</h2>
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Client Since</p>
-                    <p>{formatDate(client.createdAt)}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Primary Contact</p>
-                    <p>{client.contact}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Client Value</p>
-                    <p className="font-semibold">{clientValue}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Tags</h2>
-                  <button className="text-xs text-crm-yellow hover:underline">
-                    Manage Tags
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">{client.industry}</Badge>
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-200">VIP</Badge>
-                  <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">Enterprise</Badge>
-                </div>
-              </div>
-            </div>
+          <div className="flex items-center gap-3 mt-4 md:mt-0">
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+              client.status === "Active" ? "bg-green-100 text-green-800" : 
+              client.status === "Inactive" ? "bg-gray-100 text-gray-800" : 
+              "bg-crm-yellow-light text-crm-yellow"
+            }`}>
+              {client.status}
+            </span>
             
-            {/* Right column - Tabs content */}
-            <div className="lg:col-span-2">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full mb-6 bg-gray-100">
-                  <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
-                  <TabsTrigger value="tasks" className="flex-1">Tasks ({clientTasks.length})</TabsTrigger>
-                  <TabsTrigger value="documents" className="flex-1">Documents</TabsTrigger>
-                  <TabsTrigger value="history" className="flex-1">History</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="overview" className="space-y-6">
-                  {/* Activity summary card */}
-                  <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold">Activity Summary</h2>
-                      <span className="text-xs text-gray-500">Last 30 days</span>
-                    </div>
-                    
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="p-4 border border-gray-100 rounded-lg text-center">
-                        <p className="text-2xl font-bold text-crm-yellow">3</p>
-                        <p className="text-sm text-gray-600">Meetings</p>
-                      </div>
-                      <div className="p-4 border border-gray-100 rounded-lg text-center">
-                        <p className="text-2xl font-bold text-crm-yellow">12</p>
-                        <p className="text-sm text-gray-600">Emails</p>
-                      </div>
-                      <div className="p-4 border border-gray-100 rounded-lg text-center">
-                        <p className="text-2xl font-bold text-crm-yellow">5</p>
-                        <p className="text-sm text-gray-600">Tasks</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Notes card */}
-                  <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold">Notes</h2>
-                      <button 
-                        onClick={() => setIsAddNoteModalOpen(true)}
-                        className="flex items-center text-xs text-crm-yellow hover:underline"
-                      >
-                        <PlusCircle size={14} className="mr-1" />
-                        Add Note
-                      </button>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="border-b border-gray-100 pb-4">
-                        <div className="flex justify-between mb-1">
-                          <h3 className="font-medium">Client Meeting Notes</h3>
-                          <span className="text-xs text-gray-500">March 15, 2025</span>
-                        </div>
-                        <p className="text-gray-600 text-sm">
-                          Met with {client.contact} to discuss the upcoming project timeline. They expressed 
-                          interest in additional services that we should follow up on next month.
-                        </p>
-                      </div>
-                      
-                      <div className="border-b border-gray-100 pb-4">
-                        <div className="flex justify-between mb-1">
-                          <h3 className="font-medium">Contract Renewal Discussion</h3>
-                          <span className="text-xs text-gray-500">February 28, 2025</span>
-                        </div>
-                        <p className="text-gray-600 text-sm">
-                          Discussed contract renewal terms. Client is considering the premium package 
-                          upgrade. Need to send a formal proposal by next week.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Upcoming activities */}
-                  <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold">Upcoming Activities</h2>
-                      <a href="#" className="text-xs text-crm-yellow hover:underline">View Calendar</a>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-start">
-                        <div className="bg-crm-yellow-light p-2 rounded mr-3">
-                          <Calendar size={16} className="text-crm-yellow" />
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="font-medium">Quarterly Review Meeting</h3>
-                            <Badge className="ml-2 bg-blue-100 text-blue-800">Meeting</Badge>
-                          </div>
-                          <p className="text-sm text-gray-500">April 12, 2025 at 10:00 AM</p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Virtual meeting to review Q1 performance and discuss Q2 goals.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start">
-                        <div className="bg-crm-yellow-light p-2 rounded mr-3">
-                          <CheckCircle size={16} className="text-crm-yellow" />
-                        </div>
-                        <div>
-                          <div className="flex items-center">
-                            <h3 className="font-medium">Contract Renewal Deadline</h3>
-                            <Badge className="ml-2 bg-red-100 text-red-800">Deadline</Badge>
-                          </div>
-                          <p className="text-sm text-gray-500">April 30, 2025</p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Current contract expires. New proposal must be signed by this date.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="tasks" className="space-y-6">
-                  <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold">Client Tasks</h2>
-                      <button className="flex items-center text-xs text-crm-yellow hover:underline">
-                        <PlusCircle size={14} className="mr-1" />
-                        Add Task
-                      </button>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      {clientTasks.length > 0 ? (
-                        clientTasks.map((task) => (
-                          <div key={task.id} className="border-b border-gray-100 pb-4 last:border-0">
-                            <div className="flex justify-between mb-1">
-                              <div className="flex items-center">
-                                <h3 className="font-medium">{task.title}</h3>
-                                <Badge 
-                                  className={`ml-2 ${
-                                    task.priority === "High" 
-                                      ? "bg-red-100 text-red-800" 
-                                      : task.priority === "Medium"
-                                      ? "bg-crm-yellow-light text-crm-yellow" 
-                                      : "bg-blue-100 text-blue-800"
-                                  }`}
-                                >
-                                  {task.priority}
-                                </Badge>
-                              </div>
-                              <Badge 
-                                className={`${
-                                  task.status === "Completed" 
-                                    ? "bg-green-100 text-green-800" 
-                                    : task.status === "In Progress"
-                                    ? "bg-blue-100 text-blue-800" 
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {task.status}
-                              </Badge>
-                            </div>
-                            <p className="text-gray-600 text-sm">{task.description}</p>
-                            <div className="flex justify-between mt-2 text-xs text-gray-500">
-                              <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-                              <span>Assigned to: {task.assignedTo}</span>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="text-center py-8">
-                          <p className="text-gray-500">No tasks found for this client</p>
-                          <button className="btn-primary mt-4">Create First Task</button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="documents" className="space-y-6">
-                  <div className="card">
-                    <div className="flex justify-between items-center mb-4">
-                      <h2 className="text-lg font-semibold">Documents</h2>
-                      <button className="flex items-center text-xs text-crm-yellow hover:underline">
-                        <PlusCircle size={14} className="mr-1" />
-                        Upload Document
-                      </button>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center p-3 border border-gray-100 rounded-lg">
-                        <div className="bg-gray-100 p-2 rounded mr-3">
-                          <FileText size={20} className="text-gray-500" />
-                        </div>
-                        <div className="flex-grow">
-                          <h3 className="font-medium">Client Contract 2025.pdf</h3>
-                          <p className="text-xs text-gray-500">Added March 1, 2025</p>
-                        </div>
-                        <button className="text-crm-yellow hover:underline text-sm">Download</button>
-                      </div>
-                      
-                      <div className="flex items-center p-3 border border-gray-100 rounded-lg">
-                        <div className="bg-gray-100 p-2 rounded mr-3">
-                          <FileText size={20} className="text-gray-500" />
-                        </div>
-                        <div className="flex-grow">
-                          <h3 className="font-medium">Quarterly Report Q1 2025.pdf</h3>
-                          <p className="text-xs text-gray-500">Added April 2, 2025</p>
-                        </div>
-                        <button className="text-crm-yellow hover:underline text-sm">Download</button>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="history" className="space-y-6">
-                  <div className="card">
-                    <h2 className="text-lg font-semibold mb-4">Activity History</h2>
-                    <div className="relative">
-                      {/* Timeline line */}
-                      <div className="absolute left-1.5 top-1 bottom-0 w-0.5 bg-gray-200"></div>
-                      
-                      <div className="space-y-6">
-                        <div className="relative pl-8">
-                          <div className="absolute left-0 top-1 w-3 h-3 rounded-full bg-crm-yellow"></div>
-                          <div className="flex justify-between">
-                            <h3 className="font-medium">Contract Updated</h3>
-                            <span className="text-xs text-gray-500">April 3, 2025</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Contract was updated to include additional services.
-                          </p>
-                        </div>
-                        
-                        <div className="relative pl-8">
-                          <div className="absolute left-0 top-1 w-3 h-3 rounded-full bg-crm-yellow"></div>
-                          <div className="flex justify-between">
-                            <h3 className="font-medium">Meeting Completed</h3>
-                            <span className="text-xs text-gray-500">March 15, 2025</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Quarterly review meeting with client stakeholders.
-                          </p>
-                        </div>
-                        
-                        <div className="relative pl-8">
-                          <div className="absolute left-0 top-1 w-3 h-3 rounded-full bg-crm-yellow"></div>
-                          <div className="flex justify-between">
-                            <h3 className="font-medium">Email Campaign Sent</h3>
-                            <span className="text-xs text-gray-500">February 28, 2025</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Promotional email sent to client contacts about new services.
-                          </p>
-                        </div>
-                        
-                        <div className="relative pl-8">
-                          <div className="absolute left-0 top-1 w-3 h-3 rounded-full bg-crm-yellow"></div>
-                          <div className="flex justify-between">
-                            <h3 className="font-medium">Payment Received</h3>
-                            <span className="text-xs text-gray-500">January 15, 2025</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Invoice #2025-001 payment received.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <Edit2 size={16} className="text-gray-600" />
+            </button>
+            
+            <button className="p-2 rounded-full hover:bg-gray-100">
+              <Trash2 size={16} className="text-gray-600" />
+            </button>
           </div>
         </div>
-      </main>
-      
-      {/* Edit Client Modal */}
-      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Client</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Client Name</label>
-              <input 
-                type="text" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                defaultValue={client.name} 
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Industry</label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  defaultValue={client.industry} 
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Status</label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                  <option value="Active" selected={client.status === "Active"}>Active</option>
-                  <option value="Inactive" selected={client.status === "Inactive"}>Inactive</option>
-                  <option value="Lead" selected={client.status === "Lead"}>Lead</option>
-                </select>
-              </div>
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-1 block">Primary Contact</label>
-              <input 
-                type="text" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                defaultValue={client.contact} 
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-1 block">Email</label>
-                <input 
-                  type="email" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  defaultValue={client.email} 
-                />
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium mb-1 block">Phone</label>
-                <input 
-                  type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  defaultValue={client.phone} 
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <button className="px-4 py-2 border border-gray-300 rounded-md text-sm">
-                Cancel
-              </button>
-            </DialogClose>
-            <button 
-              onClick={handleEdit} 
-              className="bg-crm-yellow text-black px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Save Changes
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete Client Modal */}
-      <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Client</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p>Are you sure you want to delete client "{client.name}"? This action cannot be undone.</p>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <button className="px-4 py-2 border border-gray-300 rounded-md text-sm">
-                Cancel
-              </button>
-            </DialogClose>
-            <button 
-              onClick={handleDelete} 
-              className="bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Delete Client
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Add Note Modal */}
-      <Dialog open={isAddNoteModalOpen} onOpenChange={setIsAddNoteModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Note</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Title</label>
-              <input 
-                type="text" 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                placeholder="Note title" 
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium mb-1 block">Content</label>
-              <textarea 
-                className="w-full px-3 py-2 border border-gray-300 rounded-md min-h-[100px]"
-                placeholder="Enter note content here..." 
-              ></textarea>
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <button className="px-4 py-2 border border-gray-300 rounded-md text-sm">
-                Cancel
-              </button>
-            </DialogClose>
-            <button 
-              onClick={handleAddNote} 
-              className="bg-crm-yellow text-black px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Add Note
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <style>
-        {`
-          .card {
-            @apply bg-white p-6 rounded-lg border border-gray-100 shadow-sm;
-          }
+        
+        {/* Client tabs */}
+        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="tasks">Tasks</TabsTrigger>
+            <TabsTrigger value="activities">Activities</TabsTrigger>
+            <TabsTrigger value="notes">Notes</TabsTrigger>
+          </TabsList>
           
-          .btn-primary {
-            @apply bg-crm-yellow text-black px-4 py-2 rounded-md text-sm font-medium hover:bg-crm-yellow/80 transition-colors;
-          }
-        `}
-      </style>
+          <TabsContent value="overview" className="animate-in">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="col-span-2 space-y-6">
+                {/* Client info card */}
+                <div className="card">
+                  <h2 className="text-lg font-semibold mb-4">Client Information</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex">
+                        <User size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Contact Person</p>
+                          <p>{client.contactPerson || "Not specified"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex">
+                        <Mail size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Email</p>
+                          <p>{client.email}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex">
+                        <Phone size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Phone</p>
+                          <p>{client.phone}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex">
+                        <MapPin size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Address</p>
+                          <p>{client.address || "Not specified"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex">
+                        <Calendar size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Since</p>
+                          <p>{client.since ? formatDate(client.since) : "Not specified"}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex">
+                        <Clock size={18} className="text-gray-400 mr-2 mt-1" />
+                        <div>
+                          <p className="text-sm text-gray-600">Last Activity</p>
+                          <p>{formatRelativeTime(client.lastActivity)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Recent tasks */}
+                <div className="card">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Recent Tasks</h2>
+                    <button 
+                      onClick={() => setActiveTab("tasks")}
+                      className="text-sm text-crm-yellow hover:underline flex items-center"
+                    >
+                      View All
+                      <ChevronRight size={16} className="ml-1" />
+                    </button>
+                  </div>
+                  
+                  {clientTasks.length > 0 ? (
+                    <div className="space-y-4">
+                      {clientTasks.slice(0, 3).map(task => (
+                        <div key={task.id} className="border-b border-crm-light-gray pb-4 last:border-0">
+                          <div className="flex justify-between">
+                            <h4 className="font-medium">{task.title}</h4>
+                            <span className={`badge ${
+                              task.priority === "High" 
+                                ? "bg-red-100 text-red-800" 
+                                : task.priority === "Medium"
+                                ? "bg-crm-yellow-light text-crm-yellow" 
+                                : "bg-blue-100 text-blue-800"
+                            }`}>
+                              {task.priority}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {task.description.length > 60 
+                              ? task.description.substring(0, 60) + "..." 
+                              : task.description}
+                          </p>
+                          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                            <div className="flex items-center">
+                              <Calendar size={12} className="mr-1" />
+                              <span>
+                                Due: {formatDate(task.dueDate)}
+                              </span>
+                            </div>
+                            <span>Assigned to: {task.assignedTo}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      <p>No tasks for this client</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Right column */}
+              <div className="space-y-6">
+                {/* Client statistics */}
+                <div className="card">
+                  <h2 className="text-lg font-semibold mb-4">Client Statistics</h2>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="rounded-full bg-crm-yellow-light p-2 mr-3">
+                          <FileText size={16} className="text-crm-yellow" />
+                        </div>
+                        <span>Total Projects</span>
+                      </div>
+                      <span className="font-bold">{client.totalProjects || 0}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="rounded-full bg-blue-100 p-2 mr-3">
+                          <BarChart2 size={16} className="text-blue-600" />
+                        </div>
+                        <span>Revenue</span>
+                      </div>
+                      <span className="font-bold">${client.revenue?.toLocaleString() || "0"}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center">
+                        <div className="rounded-full bg-green-100 p-2 mr-3">
+                          <CheckCircle size={16} className="text-green-600" />
+                        </div>
+                        <span>Tasks Completed</span>
+                      </div>
+                      <span className="font-bold">{client.tasksCompleted || 0}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Recent activities */}
+                <div className="card">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold">Recent Activities</h2>
+                    <button 
+                      onClick={() => setActiveTab("activities")}
+                      className="text-sm text-crm-yellow hover:underline flex items-center"
+                    >
+                      View All
+                      <ChevronRight size={16} className="ml-1" />
+                    </button>
+                  </div>
+                  
+                  {clientActivities.length > 0 ? (
+                    <div className="space-y-4">
+                      {clientActivities.slice(0, 4).map(activity => (
+                        <div key={activity.id} className="flex border-b border-crm-light-gray pb-4 last:border-0">
+                          <div className="mr-4">
+                            <div className="bg-crm-yellow-light p-2 rounded-full">
+                              {activity.type === "email" && <Mail size={16} className="text-crm-yellow" />}
+                              {activity.type === "call" && <Phone size={16} className="text-crm-yellow" />}
+                              {activity.type === "meeting" && <Calendar size={16} className="text-crm-yellow" />}
+                              {activity.type === "task" && <CheckCircle size={16} className="text-crm-yellow" />}
+                              {activity.type === "note" && <FileText size={16} className="text-crm-yellow" />}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-sm">{activity.description}</p>
+                            <div className="flex items-center mt-1 text-xs text-gray-500">
+                              <Clock size={12} className="mr-1" />
+                              <span>{formatRelativeTime(activity.timestamp)}</span>
+                              <span className="mx-2">•</span>
+                              <span>{activity.user}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      <p>No activities recorded</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="tasks" className="animate-in">
+            <div className="card">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">All Tasks</h2>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
+                      <PlusCircle size={16} className="mr-2" />
+                      Add Task
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add New Task</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      {/* Task form fields would go here */}
+                      <p>Task creation form will appear here</p>
+                    </div>
+                    <DialogFooter>
+                      <DialogClose asChild>
+                        <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">Cancel</button>
+                      </DialogClose>
+                      <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md">Add Task</button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              {clientTasks.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left pb-3 font-medium text-gray-600">Title</th>
+                        <th className="text-left pb-3 font-medium text-gray-600">Priority</th>
+                        <th className="text-left pb-3 font-medium text-gray-600">Due Date</th>
+                        <th className="text-left pb-3 font-medium text-gray-600">Status</th>
+                        <th className="text-left pb-3 font-medium text-gray-600">Assigned To</th>
+                        <th className="text-right pb-3 font-medium text-gray-600">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clientTasks.map(task => (
+                        <tr key={task.id} className="border-b border-gray-100 last:border-0">
+                          <td className="py-4">{task.title}</td>
+                          <td className="py-4">
+                            <span className={`badge ${
+                              task.priority === "High" 
+                                ? "bg-red-100 text-red-800" 
+                                : task.priority === "Medium"
+                                ? "bg-crm-yellow-light text-crm-yellow" 
+                                : "bg-blue-100 text-blue-800"
+                            }`}>
+                              {task.priority}
+                            </span>
+                          </td>
+                          <td className="py-4">{formatDate(task.dueDate)}</td>
+                          <td className="py-4">
+                            <span className={`badge ${
+                              task.status === "Completed" 
+                                ? "bg-green-100 text-green-800" 
+                                : task.status === "In Progress"
+                                ? "bg-blue-100 text-blue-800" 
+                                : "bg-crm-yellow-light text-crm-yellow"
+                            }`}>
+                              {task.status}
+                            </span>
+                          </td>
+                          <td className="py-4">{task.assignedTo}</td>
+                          <td className="py-4 text-right">
+                            <button className="p-2 rounded-full hover:bg-gray-100">
+                              <Edit2 size={16} className="text-gray-600" />
+                            </button>
+                            <button className="p-2 rounded-full hover:bg-gray-100">
+                              <Trash2 size={16} className="text-gray-600" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="mb-4">No tasks found for this client</p>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
+                        <PlusCircle size={16} className="mr-2" />
+                        Add First Task
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Add New Task</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        {/* Task form fields would go here */}
+                        <p>Task creation form will appear here</p>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">Cancel</button>
+                        </DialogClose>
+                        <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md">Add Task</button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="activities" className="animate-in">
+            <div className="card">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">Activity History</h2>
+                <div className="flex gap-2">
+                  <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
+                    <PlusCircle size={16} className="mr-2" />
+                    Log Activity
+                  </button>
+                </div>
+              </div>
+              
+              {clientActivities.length > 0 ? (
+                <div className="space-y-4">
+                  {clientActivities.map(activity => (
+                    <div key={activity.id} className="flex border-b border-crm-light-gray pb-4 last:border-0">
+                      <div className="mr-4">
+                        <div className="bg-crm-yellow-light p-2 rounded-full">
+                          {activity.type === "email" && <Mail size={16} className="text-crm-yellow" />}
+                          {activity.type === "call" && <Phone size={16} className="text-crm-yellow" />}
+                          {activity.type === "meeting" && <Calendar size={16} className="text-crm-yellow" />}
+                          {activity.type === "task" && <CheckCircle size={16} className="text-crm-yellow" />}
+                          {activity.type === "note" && <FileText size={16} className="text-crm-yellow" />}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between">
+                          <p>{activity.description}</p>
+                          <div className="flex">
+                            <button className="p-1 rounded-full hover:bg-gray-100">
+                              <Edit2 size={14} className="text-gray-500" />
+                            </button>
+                            <button className="p-1 rounded-full hover:bg-gray-100">
+                              <Trash2 size={14} className="text-gray-500" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex items-center mt-1 text-xs text-gray-500">
+                          <Clock size={12} className="mr-1" />
+                          <span>{formatDate(activity.timestamp)} at {new Date(activity.timestamp).toLocaleTimeString()}</span>
+                          <span className="mx-2">•</span>
+                          <span>{activity.user}</span>
+                          {activity.type && (
+                            <>
+                              <span className="mx-2">•</span>
+                              <span className="capitalize">{activity.type}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <p className="mb-4">No activities recorded for this client</p>
+                  <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
+                    <PlusCircle size={16} className="mr-2" />
+                    Log First Activity
+                  </button>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="notes" className="animate-in">
+            <div className="card">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">Client Notes</h2>
+                <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
+                  <PlusCircle size={16} className="mr-2" />
+                  Add Note
+                </button>
+              </div>
+              
+              <div className="text-center py-12 text-gray-500">
+                <p className="mb-4">No notes found for this client</p>
+                <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
+                  <PlusCircle size={16} className="mr-2" />
+                  Add First Note
+                </button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
   );
 };

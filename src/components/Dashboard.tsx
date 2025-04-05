@@ -154,7 +154,9 @@ const Dashboard = () => {
   
   const handleClientClick = (clientId: number) => {
     navigate(`/clients/${clientId}`);
-    toast.info(`Viewing details for client #${clientId}`);
+    toast.success("Loading client details", {
+      description: "Viewing detailed information for this client"
+    });
   };
   
   return (

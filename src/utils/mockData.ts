@@ -1,251 +1,285 @@
 
-// Client data
+// Example mock data for the CRM dashboard
+
+export const dashboardStats = {
+  totalClients: 128,
+  tasksCompleted: 324,
+  totalRevenue: 542000,
+  revenueGrowth: 14.5,
+  avgResponseTime: 1.8
+};
+
+// Sample clients data with more complete information
 export const clients = [
   {
     id: 1,
     name: "Acme Corporation",
-    contact: "John Smith",
-    email: "john@acmecorp.com",
-    phone: "(555) 123-4567",
     industry: "Technology",
+    logo: "A",
     status: "Active",
-    revenue: 750000,
-    createdAt: "2023-01-15",
-    lastActivity: "2024-03-28",
-    logo: "AC"
+    email: "contact@acmecorp.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Tech Avenue, San Francisco, CA 94107",
+    contactPerson: "John Smith",
+    since: "2023-01-15",
+    lastActivity: "2025-04-03T14:32:00",
+    totalProjects: 7,
+    revenue: 128000,
+    tasksCompleted: 42
   },
   {
     id: 2,
-    name: "Global Industries",
-    contact: "Sarah Johnson",
-    email: "sarah@globalind.com",
-    phone: "(555) 234-5678",
+    name: "Global Innovations",
     industry: "Manufacturing",
+    logo: "G",
     status: "Active",
-    revenue: 1250000,
-    createdAt: "2022-09-03",
-    lastActivity: "2024-03-25",
-    logo: "GI"
+    email: "info@globalinnovations.com",
+    phone: "+1 (555) 987-6543",
+    address: "456 Industry Parkway, Detroit, MI 48226",
+    contactPerson: "Sarah Johnson",
+    since: "2022-08-21",
+    lastActivity: "2025-04-01T09:15:00",
+    totalProjects: 4,
+    revenue: 85000,
+    tasksCompleted: 28
   },
   {
     id: 3,
-    name: "Summit Financial",
-    contact: "Robert Chen",
-    email: "robert@summitfin.com",
-    phone: "(555) 345-6789",
-    industry: "Finance",
-    status: "Inactive",
-    revenue: 2100000,
-    createdAt: "2023-03-21",
-    lastActivity: "2024-02-10",
-    logo: "SF"
+    name: "EcoSolutions",
+    industry: "Environmental",
+    logo: "E",
+    status: "Lead",
+    email: "contact@ecosolutions.org",
+    phone: "+1 (555) 456-7890",
+    address: "789 Green Street, Portland, OR 97205",
+    contactPerson: "Michael Green",
+    since: "2023-11-05",
+    lastActivity: "2025-04-02T16:45:00",
+    totalProjects: 2,
+    revenue: 34000,
+    tasksCompleted: 12
   },
   {
     id: 4,
-    name: "Harmony Healthcare",
-    contact: "Maria Garcia",
-    email: "maria@harmonyhc.com",
-    phone: "(555) 456-7890",
-    industry: "Healthcare",
+    name: "Finance Pro",
+    industry: "Finance",
+    logo: "F",
     status: "Active",
-    revenue: 980000,
-    createdAt: "2022-11-08",
-    lastActivity: "2024-03-15",
-    logo: "HH"
+    email: "support@financepro.com",
+    phone: "+1 (555) 789-0123",
+    address: "10 Wall Street, New York, NY 10005",
+    contactPerson: "Amanda Williams",
+    since: "2022-03-18",
+    lastActivity: "2025-03-28T11:20:00",
+    totalProjects: 9,
+    revenue: 215000,
+    tasksCompleted: 56
   },
   {
     id: 5,
-    name: "Elite Marketing",
-    contact: "David Wilson",
-    email: "david@elitemark.com",
-    phone: "(555) 567-8901",
-    industry: "Marketing",
-    status: "Active",
-    revenue: 650000,
-    createdAt: "2023-02-14",
-    lastActivity: "2024-03-22",
-    logo: "EM"
+    name: "MediCare Plus",
+    industry: "Healthcare",
+    logo: "M",
+    status: "Inactive",
+    email: "info@medicareplus.com",
+    phone: "+1 (555) 234-5678",
+    address: "567 Hospital Drive, Boston, MA 02114",
+    contactPerson: "Dr. Robert Chen",
+    since: "2021-06-12",
+    lastActivity: "2025-03-15T13:45:00",
+    totalProjects: 5,
+    revenue: 78000,
+    tasksCompleted: 37
   }
 ];
 
-// Task data
+// Sample tasks data with client IDs
 export const tasks = [
   {
     id: 1,
-    title: "Follow up on proposal",
-    description: "Send follow-up email regarding the proposal sent last week",
-    status: "Pending",
+    title: "Website Redesign",
+    description: "Redesign the client's website to improve user experience and mobile compatibility.",
     priority: "High",
-    dueDate: "2024-04-10T15:00:00",
-    clientId: 1,
-    assignedTo: "John Doe"
+    dueDate: "2025-04-15T16:00:00",
+    status: "In Progress",
+    assignedTo: "Jessica Chen",
+    clientId: 1
   },
   {
     id: 2,
-    title: "Schedule product demo",
-    description: "Schedule a product demonstration with the client's team",
-    status: "In Progress",
+    title: "Quarterly Review",
+    description: "Conduct quarterly review meeting to discuss progress and next steps.",
     priority: "Medium",
-    dueDate: "2024-04-12T13:30:00",
-    clientId: 2,
-    assignedTo: "Jane Smith"
+    dueDate: "2025-04-10T10:00:00",
+    status: "Scheduled",
+    assignedTo: "Michael Rodriguez",
+    clientId: 1
   },
   {
     id: 3,
-    title: "Prepare contract",
-    description: "Draft the service contract for new client",
-    status: "Completed",
+    title: "Contract Renewal",
+    description: "Prepare and send contract renewal documents before expiration date.",
     priority: "High",
-    dueDate: "2024-04-01T10:00:00",
-    clientId: 3,
-    assignedTo: "Robert Johnson"
+    dueDate: "2025-04-30T12:00:00",
+    status: "Not Started",
+    assignedTo: "David Johnson",
+    clientId: 2
   },
   {
     id: 4,
-    title: "Invoice payment reminder",
-    description: "Send a friendly reminder about the outstanding invoice",
-    status: "Pending",
+    title: "SEO Optimization",
+    description: "Implement SEO improvements to increase organic traffic.",
     priority: "Medium",
-    dueDate: "2024-04-08T09:00:00",
-    clientId: 1,
-    assignedTo: "John Doe"
+    dueDate: "2025-04-20T15:00:00",
+    status: "In Progress",
+    assignedTo: "Sarah Lee",
+    clientId: 3
   },
   {
     id: 5,
-    title: "Quarterly review meeting",
-    description: "Prepare and conduct quarterly review meeting with client",
+    title: "Social Media Campaign",
+    description: "Design and launch Q2 social media campaign across all platforms.",
+    priority: "Medium",
+    dueDate: "2025-04-12T09:00:00",
     status: "In Progress",
+    assignedTo: "Jessica Chen",
+    clientId: 4
+  },
+  {
+    id: 6,
+    title: "Data Analysis",
+    description: "Analyze customer data and prepare insights report.",
+    priority: "Low",
+    dueDate: "2025-04-25T17:00:00",
+    status: "Not Started",
+    assignedTo: "Alex Martinez",
+    clientId: 5
+  },
+  {
+    id: 7,
+    title: "Content Creation",
+    description: "Create blog content for next month's marketing push.",
+    priority: "Medium",
+    dueDate: "2025-04-18T12:00:00",
+    status: "Not Started",
+    assignedTo: "Emily Wong",
+    clientId: 1
+  },
+  {
+    id: 8,
+    title: "Budget Review",
+    description: "Review and approve marketing budget for Q3.",
     priority: "High",
-    dueDate: "2024-04-15T14:00:00",
-    clientId: 4,
-    assignedTo: "Jane Smith"
+    dueDate: "2025-04-08T14:00:00",
+    status: "Completed",
+    assignedTo: "David Johnson",
+    clientId: 2
   }
 ];
 
-// Recent activities data
+// Sample recent activities data with client IDs
 export const recentActivities = [
   {
     id: 1,
     type: "email",
-    description: "Sent proposal to Acme Corporation",
-    timestamp: "2024-04-03T10:23:00",
-    user: "John Doe"
+    description: "Sent proposal for website redesign project",
+    timestamp: "2025-04-03T14:32:00",
+    user: "Jessica Chen",
+    clientId: 1
   },
   {
     id: 2,
     type: "call",
-    description: "Phone call with Global Industries regarding new requirements",
-    timestamp: "2024-04-02T15:45:00",
-    user: "Jane Smith"
+    description: "Discussed contract renewal options",
+    timestamp: "2025-04-03T11:15:00",
+    user: "David Johnson",
+    clientId: 2
   },
   {
     id: 3,
     type: "meeting",
-    description: "Kickoff meeting with Harmony Healthcare",
-    timestamp: "2024-04-02T13:00:00",
-    user: "Robert Johnson"
+    description: "Initial consultation for environmental assessment",
+    timestamp: "2025-04-02T16:45:00",
+    user: "Michael Rodriguez",
+    clientId: 3
   },
   {
     id: 4,
     type: "task",
-    description: "Completed contract preparation for Summit Financial",
-    timestamp: "2024-04-01T11:30:00",
-    user: "Jane Smith"
+    description: "Completed Q1 financial analysis report",
+    timestamp: "2025-04-02T09:30:00",
+    user: "Sarah Lee",
+    clientId: 4
   },
   {
     id: 5,
     type: "note",
-    description: "Added notes from client feedback session with Elite Marketing",
-    timestamp: "2024-03-31T16:15:00",
-    user: "John Doe"
+    description: "Updated client contact information",
+    timestamp: "2025-04-01T15:20:00",
+    user: "Emily Wong",
+    clientId: 5
   },
   {
     id: 6,
     type: "email",
-    description: "Sent meeting minutes to Harmony Healthcare",
-    timestamp: "2024-03-31T09:20:00",
-    user: "Robert Johnson"
+    description: "Followed up on project timeline",
+    timestamp: "2025-04-01T13:45:00",
+    user: "Michael Rodriguez",
+    clientId: 1
+  },
+  {
+    id: 7,
+    type: "call",
+    description: "Addressed concerns about delivery timeline",
+    timestamp: "2025-03-31T10:20:00",
+    user: "Jessica Chen",
+    clientId: 3
+  },
+  {
+    id: 8,
+    type: "meeting",
+    description: "Quarterly review with leadership team",
+    timestamp: "2025-03-30T14:00:00",
+    user: "David Johnson",
+    clientId: 1
+  },
+  {
+    id: 9,
+    type: "task",
+    description: "Updated website content as requested",
+    timestamp: "2025-03-30T11:30:00",
+    user: "Emily Wong",
+    clientId: 2
+  },
+  {
+    id: 10,
+    type: "note",
+    description: "Client expressed interest in additional services",
+    timestamp: "2025-03-29T15:45:00",
+    user: "Sarah Lee",
+    clientId: 4
   }
 ];
 
-// Revenue data for charts
+// Sample revenue data for charts
 export const revenueData = [
-  { month: "Jan", revenue: 45000 },
-  { month: "Feb", revenue: 52000 },
-  { month: "Mar", revenue: 48000 },
-  { month: "Apr", revenue: 61000 },
-  { month: "May", revenue: 55000 },
-  { month: "Jun", revenue: 67000 },
-  { month: "Jul", revenue: 72000 }
+  { month: "Jan", revenue: 42000 },
+  { month: "Feb", revenue: 38000 },
+  { month: "Mar", revenue: 45000 },
+  { month: "Apr", revenue: 52000 },
+  { month: "May", revenue: 48000 },
+  { month: "Jun", revenue: 57000 },
+  { month: "Jul", revenue: 63000 },
+  { month: "Aug", revenue: 59000 },
+  { month: "Sep", revenue: 68000 },
+  { month: "Oct", revenue: 72000 },
+  { month: "Nov", revenue: 81000 },
+  { month: "Dec", revenue: 89000 }
 ];
 
-// Task status data for charts
+// Sample task status data for the pie chart
 export const taskStatusData = [
-  { status: "Completed", count: 12 },
-  { status: "In Progress", count: 8 },
-  { status: "Pending", count: 5 }
-];
-
-// Client acquisition data for charts
-export const clientAcquisitionData = [
-  { month: "Jan", count: 3 },
-  { month: "Feb", count: 2 },
-  { month: "Mar", count: 4 },
-  { month: "Apr", count: 3 },
-  { month: "May", count: 5 },
-  { month: "Jun", count: 7 },
-  { month: "Jul", count: 4 }
-];
-
-// Dashboard stats
-export const dashboardStats = {
-  totalClients: 24,
-  tasksCompleted: 45,
-  totalRevenue: 1250000,
-  revenueGrowth: 16.8,
-  avgResponseTime: 3.2
-};
-
-// Current user data
-export const currentUser = {
-  id: 1,
-  name: "John Doe",
-  email: "john.doe@example.com",
-  phone: "(555) 123-4567",
-  role: "Sales Manager",
-  department: "Sales",
-  joinDate: "2022-05-15",
-  avatar: "JD"
-};
-
-// Notifications
-export const notifications = [
-  {
-    id: 1,
-    title: "New task assigned",
-    description: "You have been assigned a new task: 'Follow up with Acme Corp'",
-    timestamp: "2024-04-03T09:30:00",
-    read: false
-  },
-  {
-    id: 2,
-    title: "Meeting reminder",
-    description: "Reminder: Client meeting with Global Industries in 30 minutes",
-    timestamp: "2024-04-02T14:30:00",
-    read: false
-  },
-  {
-    id: 3,
-    title: "Task due soon",
-    description: "The task 'Prepare quarterly report' is due tomorrow",
-    timestamp: "2024-04-01T16:45:00",
-    read: true
-  },
-  {
-    id: 4,
-    title: "Comment on task",
-    description: "Jane Smith commented on task 'Schedule product demo'",
-    timestamp: "2024-03-31T11:20:00",
-    read: true
-  }
+  { status: "Completed", count: 42 },
+  { status: "In Progress", count: 28 },
+  { status: "Not Started", count: 18 }
 ];
