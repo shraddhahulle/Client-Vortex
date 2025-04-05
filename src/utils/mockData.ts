@@ -1,4 +1,3 @@
-
 // Example mock data for the CRM dashboard
 
 export const dashboardStats = {
@@ -25,7 +24,9 @@ export const clients = [
     lastActivity: "2025-04-03T14:32:00",
     totalProjects: 7,
     revenue: 128000,
-    tasksCompleted: 42
+    tasksCompleted: 42,
+    createdAt: "2023-01-15",
+    contact: "John Smith"
   },
   {
     id: 2,
@@ -41,7 +42,9 @@ export const clients = [
     lastActivity: "2025-04-01T09:15:00",
     totalProjects: 4,
     revenue: 85000,
-    tasksCompleted: 28
+    tasksCompleted: 28,
+    createdAt: "2022-08-21",
+    contact: "Sarah Johnson"
   },
   {
     id: 3,
@@ -57,7 +60,9 @@ export const clients = [
     lastActivity: "2025-04-02T16:45:00",
     totalProjects: 2,
     revenue: 34000,
-    tasksCompleted: 12
+    tasksCompleted: 12,
+    createdAt: "2023-11-05",
+    contact: "Michael Green"
   },
   {
     id: 4,
@@ -73,7 +78,9 @@ export const clients = [
     lastActivity: "2025-03-28T11:20:00",
     totalProjects: 9,
     revenue: 215000,
-    tasksCompleted: 56
+    tasksCompleted: 56,
+    createdAt: "2022-03-18",
+    contact: "Amanda Williams"
   },
   {
     id: 5,
@@ -89,7 +96,9 @@ export const clients = [
     lastActivity: "2025-03-15T13:45:00",
     totalProjects: 5,
     revenue: 78000,
-    tasksCompleted: 37
+    tasksCompleted: 37,
+    createdAt: "2021-06-12",
+    contact: "Dr. Robert Chen"
   }
 ];
 
@@ -282,4 +291,36 @@ export const taskStatusData = [
   { status: "Completed", count: 42 },
   { status: "In Progress", count: 28 },
   { status: "Not Started", count: 18 }
+];
+
+// Adding notifications array that was missing
+export const notifications = [
+  {
+    id: 1,
+    title: "New Client Added",
+    description: "A new client has been added to your portfolio",
+    timestamp: "2025-04-05T09:30:00",
+    read: false
+  },
+  {
+    id: 2,
+    title: "Task Deadline",
+    description: "Website redesign project is due tomorrow",
+    timestamp: "2025-04-04T14:15:00",
+    read: true
+  },
+  {
+    id: 3,
+    title: "Meeting Reminder",
+    description: "Virtual meeting with Global Innovations in 30 minutes",
+    timestamp: "2025-04-05T11:00:00",
+    read: false
+  },
+  {
+    id: 4,
+    title: "Contract Renewal",
+    description: "Finance Pro contract needs renewal by end of week",
+    timestamp: "2025-04-03T16:45:00",
+    read: true
+  }
 ];

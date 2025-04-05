@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { 
   User, Mail, Phone, MapPin, Calendar, 
   FileText, BarChart2, Clock, ArrowLeft, 
-  ChevronRight, Edit2, Trash2, PlusCircle 
+  ChevronRight, Edit2, Trash2, PlusCircle,
+  CheckCircle 
 } from "lucide-react";
 import { clients, tasks, recentActivities } from "@/utils/mockData";
 import Header from "@/components/Header";
