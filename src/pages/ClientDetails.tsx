@@ -1,71 +1,62 @@
 
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { 
-  User, Mail, Phone, MapPin, Calendar, 
-  FileText, BarChart2, Clock, ArrowLeft, 
-  ChevronRight, Edit2, Trash2, PlusCircle,
-  CheckCircle 
+  ArrowLeft, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Calendar, 
+  DollarSign, 
+  CheckCircle, 
+  Clock, 
+  BarChart2,
+  Plus,
+  MessageSquare,
+  FileText,
+  ChevronDown
 } from "lucide-react";
-import { clients, tasks, recentActivities } from "@/utils/mockData";
-import Header from "@/components/Header";
-import { toast } from "@/lib/toast";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-  DialogTrigger
-} from "@/components/ui/dialog";
+import { clients, clientTasks, clientActivities, clientNotes } from "@/utils/mockData";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ClientDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const clientId = parseInt(id || "0");
-  const [client, setClient] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const client = clients.find(c => c.id === clientId);
+  
   const [activeTab, setActiveTab] = useState("overview");
   
-  // Get client's related tasks
-  const clientTasks = tasks.filter(task => task.clientId === clientId);
+  if (!client) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh]">
+        <h1 className="text-2xl font-bold mb-4">Client not found</h1>
+        <Link to="/clients">
+          <Button>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Clients
+          </Button>
+        </Link>
+      </div>
+    );
+  }
   
-  // Get client's related activities
-  const clientActivities = recentActivities.filter(
-    activity => activity.clientId === clientId
-  ).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-  useEffect(() => {
-    // Simulate API fetch
-    setTimeout(() => {
-      const foundClient = clients.find(c => c.id === clientId);
-      
-      if (foundClient) {
-        setClient(foundClient);
-      } else {
-        toast.error("Client not found", {
-          description: "The client you're looking for doesn't exist."
-        });
-        navigate("/clients");
-      }
-      
-      setIsLoading(false);
-    }, 300);
-  }, [clientId, navigate]);
+  const filteredTasks = clientTasks.filter(task => task.clientId === clientId);
+  const completedTasks = filteredTasks.filter(task => task.status === "Completed").length;
+  const completionRate = filteredTasks.length > 0 
+    ? Math.round((completedTasks / filteredTasks.length) * 100) 
+    : 0;
+  
+  const filteredActivities = clientActivities.filter(activity => activity.clientId === clientId);
+  const filteredNotes = clientNotes.filter(note => note.clientId === clientId);
   
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }).format(date);
   };
   
   const formatRelativeTime = (dateString: string) => {
@@ -86,496 +77,419 @@ const ClientDetails = () => {
       return `${days} ${days === 1 ? "day" : "days"} ago`;
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white text-black">
-        <Header />
-        <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto">
-          <div className="py-20 text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-crm-yellow"></div>
-            <p className="mt-4">Loading client information...</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!client) {
-    return (
-      <div className="min-h-screen bg-white text-black">
-        <Header />
-        <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto">
-          <div className="py-20 text-center">
-            <h2 className="text-2xl font-bold mb-2">Client Not Found</h2>
-            <p className="text-gray-600 mb-6">The client you're looking for doesn't exist.</p>
-            <button 
-              onClick={() => navigate("/clients")}
-              className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Back to Clients
-            </button>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="min-h-screen bg-white text-black">
-      <Header />
-      <main className="pt-16 px-4 md:px-6 max-w-7xl mx-auto pb-16">
-        {/* Back button */}
-        <button 
-          onClick={() => navigate(-1)}
-          className="flex items-center text-gray-600 hover:text-black mb-6 transition-colors"
-        >
-          <ArrowLeft size={16} className="mr-2" />
-          Back
-        </button>
-        
-        {/* Client header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <div className="flex items-center">
-            <div className="rounded-full bg-crm-yellow w-16 h-16 flex items-center justify-center font-bold text-black text-2xl">
-              {client.logo}
-            </div>
-            <div className="ml-4">
-              <h1 className="text-2xl font-bold">{client.name}</h1>
-              <p className="text-gray-600">{client.industry}</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-3 mt-4 md:mt-0">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-              client.status === "Active" ? "bg-green-100 text-green-800" : 
-              client.status === "Inactive" ? "bg-gray-100 text-gray-800" : 
-              "bg-crm-yellow-light text-crm-yellow"
+    <div className="space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-3">
+            <Link to="/clients" className="text-gray-500 hover:text-gray-700">
+              <ArrowLeft size={18} />
+            </Link>
+            <h1 className="text-2xl font-bold">{client.name}</h1>
+            <span className={`badge ${
+              client.status === "Active" 
+                ? "bg-green-100 text-green-800" 
+                : client.status === "Inactive"
+                ? "bg-gray-100 text-gray-800" 
+                : "bg-crm-yellow-light text-crm-yellow"
             }`}>
               {client.status}
             </span>
-            
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <Edit2 size={16} className="text-gray-600" />
-            </button>
-            
-            <button className="p-2 rounded-full hover:bg-gray-100">
-              <Trash2 size={16} className="text-gray-600" />
-            </button>
           </div>
+          <p className="text-gray-500 mt-1">{client.industry}</p>
         </div>
         
-        {/* Client tabs */}
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="tasks">Tasks</TabsTrigger>
-            <TabsTrigger value="activities">Activities</TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="animate-in">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="col-span-2 space-y-6">
-                {/* Client info card */}
-                <div className="card">
-                  <h2 className="text-lg font-semibold mb-4">Client Information</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                      <div className="flex">
-                        <User size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Contact Person</p>
-                          <p>{client.contactPerson || "Not specified"}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex">
-                        <Mail size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Email</p>
-                          <p>{client.email}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex">
-                        <Phone size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Phone</p>
-                          <p>{client.phone}</p>
-                        </div>
-                      </div>
+        <div className="flex gap-3">
+          <Button variant="outline" size="sm" className="flex items-center">
+            <Mail className="mr-2 h-4 w-4" /> Email
+          </Button>
+          <Button variant="outline" size="sm" className="flex items-center">
+            <Phone className="mr-2 h-4 w-4" /> Call
+          </Button>
+          <Button size="sm" className="flex items-center bg-crm-yellow hover:bg-crm-yellow-hover text-black">
+            <Plus className="mr-2 h-4 w-4" /> Add Task
+          </Button>
+        </div>
+      </div>
+      
+      {/* Tabs */}
+      <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-6">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="tasks">Tasks</TabsTrigger>
+          <TabsTrigger value="activities">Activities</TabsTrigger>
+          <TabsTrigger value="notes">Notes</TabsTrigger>
+        </TabsList>
+        
+        {/* Overview Tab */}
+        <TabsContent value="overview">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Client Information */}
+            <Card className="md:col-span-2">
+              <CardHeader>
+                <CardTitle>Client Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Contact Person</p>
+                      <p className="font-medium">{client.contactPerson}</p>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="flex">
-                        <MapPin size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Address</p>
-                          <p>{client.address || "Not specified"}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex">
-                        <Calendar size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Since</p>
-                          <p>{client.since ? formatDate(client.since) : "Not specified"}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex">
-                        <Clock size={18} className="text-gray-400 mr-2 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">Last Activity</p>
-                          <p>{formatRelativeTime(client.lastActivity)}</p>
-                        </div>
-                      </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Email Address</p>
+                      <p className="font-medium">{client.email}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-gray-500">Phone Number</p>
+                      <p className="font-medium">{client.phone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Address</p>
+                      <p className="font-medium">{client.address}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-gray-500">Client Since</p>
+                      <p className="font-medium">{formatDate(client.since)}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-gray-500">Last Activity</p>
+                      <p className="font-medium">{formatRelativeTime(client.lastActivity)}</p>
                     </div>
                   </div>
                 </div>
                 
-                {/* Recent tasks */}
-                <div className="card">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Recent Tasks</h2>
-                    <button 
-                      onClick={() => setActiveTab("tasks")}
-                      className="text-sm text-crm-yellow hover:underline flex items-center"
-                    >
-                      View All
-                      <ChevronRight size={16} className="ml-1" />
-                    </button>
+                <div className="pt-4 border-t border-gray-100">
+                  <h3 className="font-semibold mb-3">Additional Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Projects</p>
+                      <p className="text-xl font-semibold">{client.totalProjects}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-gray-500">Revenue</p>
+                      <p className="text-xl font-semibold">${client.revenue.toLocaleString()}</p>
+                    </div>
+                    
+                    <div>
+                      <p className="text-sm text-gray-500">Tasks Completed</p>
+                      <p className="text-xl font-semibold">{client.tasksCompleted}</p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Client Stats</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-sm text-gray-500">Task Completion</p>
+                      <p className="text-sm font-semibold">{completionRate}%</p>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-crm-yellow h-2 rounded-full" 
+                        style={{ width: `${completionRate}%` }}
+                      ></div>
+                    </div>
                   </div>
                   
-                  {clientTasks.length > 0 ? (
-                    <div className="space-y-4">
-                      {clientTasks.slice(0, 3).map(task => (
-                        <div key={task.id} className="border-b border-crm-light-gray pb-4 last:border-0">
-                          <div className="flex justify-between">
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-crm-yellow-light/30 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <DollarSign size={18} className="text-crm-yellow" />
+                          <span className="text-xs text-gray-500">Total Value</span>
+                        </div>
+                        <p className="text-lg font-semibold">${client.revenue.toLocaleString()}</p>
+                      </div>
+                      
+                      <div className="bg-green-50 p-4 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <CheckCircle size={18} className="text-green-600" />
+                          <span className="text-xs text-gray-500">Tasks Done</span>
+                        </div>
+                        <p className="text-lg font-semibold">{completedTasks}/{filteredTasks.length}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-gray-500 text-sm">Client Health</p>
+                        <p className="font-semibold text-green-600">Good</p>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                        <CheckCircle size={16} className="text-green-600" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Recent Tasks */}
+            <Card className="md:col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Recent Tasks</CardTitle>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/tasks">View All</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredTasks.length > 0 ? (
+                    filteredTasks.slice(0, 3).map((task) => (
+                      <div key={task.id} className="flex items-start justify-between p-3 border border-gray-100 rounded-lg">
+                        <div>
+                          <div className="flex items-center">
+                            <span className={`w-2 h-2 rounded-full mr-2 ${
+                              task.priority === "High" ? "bg-red-500" : 
+                              task.priority === "Medium" ? "bg-crm-yellow" : "bg-blue-500"
+                            }`} />
                             <h4 className="font-medium">{task.title}</h4>
-                            <span className={`badge ${
-                              task.priority === "High" 
-                                ? "bg-red-100 text-red-800" 
-                                : task.priority === "Medium"
-                                ? "bg-crm-yellow-light text-crm-yellow" 
-                                : "bg-blue-100 text-blue-800"
-                            }`}>
-                              {task.priority}
-                            </span>
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {task.description.length > 60 
-                              ? task.description.substring(0, 60) + "..." 
-                              : task.description}
-                          </p>
-                          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                            <div className="flex items-center">
-                              <Calendar size={12} className="mr-1" />
-                              <span>
-                                Due: {formatDate(task.dueDate)}
-                              </span>
-                            </div>
+                          <p className="text-sm text-gray-500 mt-1">{task.description}</p>
+                          <div className="flex items-center text-xs text-gray-500 mt-2">
+                            <Calendar size={12} className="mr-1" />
+                            <span>Due: {formatDate(task.dueDate)}</span>
+                          </div>
+                        </div>
+                        <span className={`badge ${
+                          task.status === "Completed" 
+                            ? "bg-green-100 text-green-800" 
+                            : task.status === "In Progress"
+                            ? "bg-blue-100 text-blue-800" 
+                            : "bg-crm-yellow-light text-crm-yellow"
+                        }`}>
+                          {task.status}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      <p>No tasks found for this client</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Recent Activities */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Recent Activities</CardTitle>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/clients">View All</Link>
+                </Button>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredActivities.length > 0 ? (
+                    filteredActivities.slice(0, 4).map((activity) => (
+                      <div key={activity.id} className="flex gap-3">
+                        <div className="shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-crm-yellow-light flex items-center justify-center">
+                            {activity.type === "email" && <Mail size={16} className="text-crm-yellow" />}
+                            {activity.type === "call" && <Phone size={16} className="text-crm-yellow" />}
+                            {activity.type === "meeting" && <Calendar size={16} className="text-crm-yellow" />}
+                            {activity.type === "task" && <CheckCircle size={16} className="text-crm-yellow" />}
+                            {activity.type === "note" && <BarChart2 size={16} className="text-crm-yellow" />}
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm">{activity.description}</p>
+                          <p className="text-xs text-gray-500">{formatRelativeTime(activity.timestamp)}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-6 text-gray-500">
+                      <p>No recent activities</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        
+        {/* Tasks Tab */}
+        <TabsContent value="tasks">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>All Tasks</CardTitle>
+              <Button size="sm" className="bg-crm-yellow hover:bg-crm-yellow-hover text-black">
+                <Plus className="mr-2 h-4 w-4" /> Add Task
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {filteredTasks.length > 0 ? (
+                  filteredTasks.map((task) => (
+                    <div key={task.id} className="flex items-start justify-between p-4 border border-gray-100 rounded-lg">
+                      <div>
+                        <div className="flex items-center">
+                          <span className={`w-2 h-2 rounded-full mr-2 ${
+                            task.priority === "High" ? "bg-red-500" : 
+                            task.priority === "Medium" ? "bg-crm-yellow" : "bg-blue-500"
+                          }`} />
+                          <h4 className="font-medium">{task.title}</h4>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">{task.description}</p>
+                        <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
+                          <div className="flex items-center">
+                            <Calendar size={12} className="mr-1" />
+                            <span>Due: {formatDate(task.dueDate)}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Clock size={12} className="mr-1" />
                             <span>Assigned to: {task.assignedTo}</span>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                      <span className={`badge ${
+                        task.status === "Completed" 
+                          ? "bg-green-100 text-green-800" 
+                          : task.status === "In Progress"
+                          ? "bg-blue-100 text-blue-800" 
+                          : "bg-crm-yellow-light text-crm-yellow"
+                      }`}>
+                        {task.status}
+                      </span>
                     </div>
-                  ) : (
-                    <div className="text-center py-6 text-gray-500">
-                      <p>No tasks for this client</p>
-                    </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500">
+                    <p>No tasks found for this client</p>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <Plus className="mr-2 h-4 w-4" /> Create First Task
+                    </Button>
+                  </div>
+                )}
               </div>
-              
-              {/* Right column */}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Activities Tab */}
+        <TabsContent value="activities">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Client Activities</CardTitle>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm">
+                  Filter <ChevronDown className="ml-1 h-4 w-4" />
+                </Button>
+                <Button size="sm" className="bg-crm-yellow hover:bg-crm-yellow-hover text-black">
+                  <Plus className="mr-2 h-4 w-4" /> Log Activity
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
               <div className="space-y-6">
-                {/* Client statistics */}
-                <div className="card">
-                  <h2 className="text-lg font-semibold mb-4">Client Statistics</h2>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="rounded-full bg-crm-yellow-light p-2 mr-3">
-                          <FileText size={16} className="text-crm-yellow" />
-                        </div>
-                        <span>Total Projects</span>
-                      </div>
-                      <span className="font-bold">{client.totalProjects || 0}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="rounded-full bg-blue-100 p-2 mr-3">
-                          <BarChart2 size={16} className="text-blue-600" />
-                        </div>
-                        <span>Revenue</span>
-                      </div>
-                      <span className="font-bold">${client.revenue?.toLocaleString() || "0"}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center">
-                        <div className="rounded-full bg-green-100 p-2 mr-3">
-                          <CheckCircle size={16} className="text-green-600" />
-                        </div>
-                        <span>Tasks Completed</span>
-                      </div>
-                      <span className="font-bold">{client.tasksCompleted || 0}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Recent activities */}
-                <div className="card">
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-lg font-semibold">Recent Activities</h2>
-                    <button 
-                      onClick={() => setActiveTab("activities")}
-                      className="text-sm text-crm-yellow hover:underline flex items-center"
-                    >
-                      View All
-                      <ChevronRight size={16} className="ml-1" />
-                    </button>
-                  </div>
-                  
-                  {clientActivities.length > 0 ? (
-                    <div className="space-y-4">
-                      {clientActivities.slice(0, 4).map(activity => (
-                        <div key={activity.id} className="flex border-b border-crm-light-gray pb-4 last:border-0">
-                          <div className="mr-4">
-                            <div className="bg-crm-yellow-light p-2 rounded-full">
-                              {activity.type === "email" && <Mail size={16} className="text-crm-yellow" />}
-                              {activity.type === "call" && <Phone size={16} className="text-crm-yellow" />}
-                              {activity.type === "meeting" && <Calendar size={16} className="text-crm-yellow" />}
-                              {activity.type === "task" && <CheckCircle size={16} className="text-crm-yellow" />}
-                              {activity.type === "note" && <FileText size={16} className="text-crm-yellow" />}
-                            </div>
-                          </div>
-                          <div>
-                            <p className="text-sm">{activity.description}</p>
-                            <div className="flex items-center mt-1 text-xs text-gray-500">
-                              <Clock size={12} className="mr-1" />
-                              <span>{formatRelativeTime(activity.timestamp)}</span>
-                              <span className="mx-2">•</span>
-                              <span>{activity.user}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-6 text-gray-500">
-                      <p>No activities recorded</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="tasks" className="animate-in">
-            <div className="card">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">All Tasks</h2>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
-                      <PlusCircle size={16} className="mr-2" />
-                      Add Task
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add New Task</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      {/* Task form fields would go here */}
-                      <p>Task creation form will appear here</p>
-                    </div>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">Cancel</button>
-                      </DialogClose>
-                      <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md">Add Task</button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              
-              {clientTasks.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left pb-3 font-medium text-gray-600">Title</th>
-                        <th className="text-left pb-3 font-medium text-gray-600">Priority</th>
-                        <th className="text-left pb-3 font-medium text-gray-600">Due Date</th>
-                        <th className="text-left pb-3 font-medium text-gray-600">Status</th>
-                        <th className="text-left pb-3 font-medium text-gray-600">Assigned To</th>
-                        <th className="text-right pb-3 font-medium text-gray-600">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {clientTasks.map(task => (
-                        <tr key={task.id} className="border-b border-gray-100 last:border-0">
-                          <td className="py-4">{task.title}</td>
-                          <td className="py-4">
-                            <span className={`badge ${
-                              task.priority === "High" 
-                                ? "bg-red-100 text-red-800" 
-                                : task.priority === "Medium"
-                                ? "bg-crm-yellow-light text-crm-yellow" 
-                                : "bg-blue-100 text-blue-800"
-                            }`}>
-                              {task.priority}
-                            </span>
-                          </td>
-                          <td className="py-4">{formatDate(task.dueDate)}</td>
-                          <td className="py-4">
-                            <span className={`badge ${
-                              task.status === "Completed" 
-                                ? "bg-green-100 text-green-800" 
-                                : task.status === "In Progress"
-                                ? "bg-blue-100 text-blue-800" 
-                                : "bg-crm-yellow-light text-crm-yellow"
-                            }`}>
-                              {task.status}
-                            </span>
-                          </td>
-                          <td className="py-4">{task.assignedTo}</td>
-                          <td className="py-4 text-right">
-                            <button className="p-2 rounded-full hover:bg-gray-100">
-                              <Edit2 size={16} className="text-gray-600" />
-                            </button>
-                            <button className="p-2 rounded-full hover:bg-gray-100">
-                              <Trash2 size={16} className="text-gray-600" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="mb-4">No tasks found for this client</p>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
-                        <PlusCircle size={16} className="mr-2" />
-                        Add First Task
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Add New Task</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        {/* Task form fields would go here */}
-                        <p>Task creation form will appear here</p>
-                      </div>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">Cancel</button>
-                        </DialogClose>
-                        <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md">Add Task</button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="activities" className="animate-in">
-            <div className="card">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">Activity History</h2>
-                <div className="flex gap-2">
-                  <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
-                    <PlusCircle size={16} className="mr-2" />
-                    Log Activity
-                  </button>
-                </div>
-              </div>
-              
-              {clientActivities.length > 0 ? (
-                <div className="space-y-4">
-                  {clientActivities.map(activity => (
-                    <div key={activity.id} className="flex border-b border-crm-light-gray pb-4 last:border-0">
-                      <div className="mr-4">
-                        <div className="bg-crm-yellow-light p-2 rounded-full">
-                          {activity.type === "email" && <Mail size={16} className="text-crm-yellow" />}
-                          {activity.type === "call" && <Phone size={16} className="text-crm-yellow" />}
-                          {activity.type === "meeting" && <Calendar size={16} className="text-crm-yellow" />}
-                          {activity.type === "task" && <CheckCircle size={16} className="text-crm-yellow" />}
-                          {activity.type === "note" && <FileText size={16} className="text-crm-yellow" />}
+                {filteredActivities.length > 0 ? (
+                  filteredActivities.map((activity) => (
+                    <div key={activity.id} className="flex gap-4 pb-6 border-b border-gray-100 last:border-0">
+                      <div className="shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-crm-yellow-light flex items-center justify-center">
+                          {activity.type === "email" && <Mail size={18} className="text-crm-yellow" />}
+                          {activity.type === "call" && <Phone size={18} className="text-crm-yellow" />}
+                          {activity.type === "meeting" && <Calendar size={18} className="text-crm-yellow" />}
+                          {activity.type === "task" && <CheckCircle size={18} className="text-crm-yellow" />}
+                          {activity.type === "note" && <BarChart2 size={18} className="text-crm-yellow" />}
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between">
-                          <p>{activity.description}</p>
-                          <div className="flex">
-                            <button className="p-1 rounded-full hover:bg-gray-100">
-                              <Edit2 size={14} className="text-gray-500" />
-                            </button>
-                            <button className="p-1 rounded-full hover:bg-gray-100">
-                              <Trash2 size={14} className="text-gray-500" />
-                            </button>
-                          </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium">{activity.title}</h4>
+                          <span className={`badge ${
+                            activity.type === "email" ? "bg-blue-100 text-blue-800" :
+                            activity.type === "call" ? "bg-green-100 text-green-800" :
+                            activity.type === "meeting" ? "bg-purple-100 text-purple-800" :
+                            activity.type === "task" ? "bg-crm-yellow-light text-crm-yellow" :
+                            "bg-gray-100 text-gray-800"
+                          }`}>
+                            {activity.type.charAt(0).toUpperCase() + activity.type.slice(1)}
+                          </span>
                         </div>
-                        <div className="flex items-center mt-1 text-xs text-gray-500">
+                        <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
+                        <div className="flex items-center mt-2 text-xs text-gray-500">
                           <Clock size={12} className="mr-1" />
-                          <span>{formatDate(activity.timestamp)} at {new Date(activity.timestamp).toLocaleTimeString()}</span>
+                          <span>{formatRelativeTime(activity.timestamp)}</span>
                           <span className="mx-2">•</span>
                           <span>{activity.user}</span>
-                          {activity.type && (
-                            <>
-                              <span className="mx-2">•</span>
-                              <span className="capitalize">{activity.type}</span>
-                            </>
-                          )}
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <p className="mb-4">No activities recorded for this client</p>
-                  <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
-                    <PlusCircle size={16} className="mr-2" />
-                    Log First Activity
-                  </button>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="notes" className="animate-in">
-            <div className="card">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-semibold">Client Notes</h2>
-                <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center">
-                  <PlusCircle size={16} className="mr-2" />
-                  Add Note
-                </button>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500">
+                    <p>No activities found for this client</p>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <Plus className="mr-2 h-4 w-4" /> Log First Activity
+                    </Button>
+                  </div>
+                )}
               </div>
-              
-              <div className="text-center py-12 text-gray-500">
-                <p className="mb-4">No notes found for this client</p>
-                <button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black px-4 py-2 rounded-md flex items-center mx-auto">
-                  <PlusCircle size={16} className="mr-2" />
-                  Add First Note
-                </button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Notes Tab */}
+        <TabsContent value="notes">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Client Notes</CardTitle>
+              <Button size="sm" className="bg-crm-yellow hover:bg-crm-yellow-hover text-black">
+                <Plus className="mr-2 h-4 w-4" /> Add Note
+              </Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {filteredNotes.length > 0 ? (
+                  filteredNotes.map((note) => (
+                    <div key={note.id} className="border border-gray-100 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{note.title}</h4>
+                        <span className="text-xs text-gray-500">{formatRelativeTime(note.createdAt)}</span>
+                      </div>
+                      <p className="text-gray-600 text-sm">{note.content}</p>
+                      <div className="flex items-center mt-4 text-xs text-gray-500">
+                        <span>Created by: {note.createdBy}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-10 text-gray-500">
+                    <p>No notes found for this client</p>
+                    <Button variant="outline" size="sm" className="mt-4">
+                      <Plus className="mr-2 h-4 w-4" /> Create First Note
+                    </Button>
+                  </div>
+                )}
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
