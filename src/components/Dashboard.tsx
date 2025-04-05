@@ -22,11 +22,11 @@ import {
 import { toast } from "@/lib/toast";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState("all");
   const [dateRange, setDateRange] = useState("7months");
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const navigate = useNavigate();
   
   const [newClient, setNewClient] = useState({
     name: "",
@@ -154,9 +154,6 @@ const Dashboard = () => {
   
   const handleClientClick = (clientId: number) => {
     navigate(`/clients/${clientId}`);
-    toast.success("Loading client details", {
-      description: "Viewing detailed information for this client"
-    });
   };
   
   return (
@@ -422,7 +419,7 @@ const Dashboard = () => {
                       <p className="text-xs text-gray-500">{client.industry}</p>
                     </div>
                   </div>
-                  <button
+                  <button 
                     onClick={() => handleClientClick(client.id)}
                     className="p-2 rounded-full hover:bg-crm-light-gray"
                     aria-label={`View details for ${client.name}`}

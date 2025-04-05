@@ -55,10 +55,10 @@ const Landing = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              <Link to="/login" className="text-gray-700 hover:text-crm-yellow">
+              <Link to="/dashboard" className="text-gray-700 hover:text-crm-yellow">
                 Log In
               </Link>
-              <Link to="/login">
+              <Link to="/dashboard">
                 <Button className="bg-crm-yellow hover:bg-crm-yellow-hover text-black">
                   Get Started
                 </Button>
@@ -78,7 +78,7 @@ const Landing = () => {
                 ClientVortex helps businesses streamline client management, boost productivity, and drive growth with an intuitive all-in-one platform.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link to="/login">
+                <Link to="/dashboard">
                   <Button size="lg" className="bg-crm-yellow hover:bg-crm-yellow-hover text-black">
                     Start Free Trial
                   </Button>
